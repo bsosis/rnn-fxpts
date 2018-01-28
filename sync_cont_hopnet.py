@@ -32,7 +32,7 @@ class Hopnet:
 
         if len(a_init.shape) == 1:
             a_init = a_init.flatten()
-        if len(a) != self.n:
+        if len(a_init) != self.n:
             raise ValueError('The given a_init does not have {} entries.'.format(self.n))
 
         self.a = np.copy(a_init)
@@ -122,7 +122,7 @@ class Hopnet:
     #             e -= self.W[i,j]*act[i]*act[j]
     #     return 0.5*e
 
-    def jacobian(self, v):
+    def jacobian(self, v, subtract_I=False):
         """ 
         Computes the Jacobian of f at v, where f(v)=tanh(gain*Wv)
         f(v)[i] = tanh(gain*W[i,:].v)
@@ -131,5 +131,8 @@ class Hopnet:
         """
 
         res = self.gain/np.cosh(self.gain*np.matmul(self.W, v))**2
-
-        return np.matmul(np.diag(res), self.W)
+        J = np.matmul(np.diag(res), self.W)
+        if subtract_I:
+            return J-np.eye(self.n)
+        else:
+            return J

@@ -138,7 +138,7 @@ class Hopnet:
     #     return partial_intermediate_of_v #- np.eye(self.n)
 
 
-    def jacobian(self, v):
+    def jacobian(self, v, subtract_I=False):
         """ 
         Computes the Jacobian of f at v, where f(v)=tanh(gain*Wv).
         See Garrett's notes for derivation.
@@ -178,7 +178,10 @@ class Hopnet:
                         cur_M_prod[j,l] += partial_intermediate_partial_intermediate(intermediate_v[i], i, j, k)*prev_M_prod[k,l]
             prev_M_prod = cur_M_prod
 
-        return prev_M_prod
+        if subtract_I:
+            return prev_M_prod-np.eye(self.n)
+        else:
+            return prev_M_prod
 
 
 
