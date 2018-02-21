@@ -190,6 +190,16 @@ def _no_jacobian(W,g,a):
 
     raise NotImplementedError
 
+def _hopfield_energy(W, gain, cur_act, prev_act):
+    """ Calculate the energy using Hopfield's derivation. """
+    # TODO: I think this equals 0.5(Wv).v --> check this
+    n = W.shape[0]
+    e = 0
+    for i in xrange(n):
+        for j in xrange(n):
+            e -= gain*W[i,j]*cur_act[i]*cur_act[j]
+    return 0.5*e
+
 
 
 class _Hopnet:
@@ -297,11 +307,12 @@ def Hopnet(n, mode=modes['sync'], gain=1.0):
     A Jacobian function is defined by W,gain,a-->J
     """
 
-    if mode[0] is None:
+    mode_lst = list(mode)
+    if mode_lst[0] is None:
         raise ValueError('Invalid mode.')
-    if mode[1] is None:
-        mode[1] = _no_energy
-    if mode[2] is None:
-        mode[2] = _no_jacobian
+    if mode_lst[1] is None:
+        mode_lst[1] = _no_energy
+    if mode_lst[2] is None:
+        mode_lst[2] = _no_jacobian
 
-    return _Hopnet(n, *mode, gain=gain)
+    return _Hopnet(n, *mode_lst, gain=gain)
